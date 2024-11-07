@@ -3,9 +3,9 @@ import { gracefulShutdown } from "./lib/graceful-shutdown";
 import { Server } from "./app";
 
 Env.checkRequiredEnvs();
+export const app = Server.init();
 
 async function main() {
-    const app = Server.init();
     const server = app.listen(Env.HTTP_PORT, () => console.log(`Server is running on port: ${Env.HTTP_PORT}`));
 
     gracefulShutdown(server);
