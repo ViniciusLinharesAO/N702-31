@@ -1,11 +1,12 @@
-export type RegisterReqBody = {
-    name: string;
-    email: string;
-    password: string;
+import { IUser } from "../user/user.interface";
+
+export type LoginReqBody = {
+    email: IUser["email"];
+    password: IUser["password"];
 };
 
-export type RequestResponse = {
+export type RequestResponse<T> = {
     success: boolean;
     message: string;
-    items: Array<any>;
+    items: Array<T>;
 };
