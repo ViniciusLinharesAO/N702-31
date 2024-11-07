@@ -3,6 +3,7 @@ import { AppError } from "./../../errors/appErrors";
 import { CreateServicesReqBody, RequestParams, RequestResponse, PaginatedResponse, PaginateQuery } from "./services.models";
 import { ServicesService } from "./services.service";
 import { StatusCode } from "../http/status-code";
+import { UsersService } from "../users/users.service";
 
 export namespace ServicesController {
     export const createServices = async (
@@ -12,8 +13,8 @@ export namespace ServicesController {
     ) => {
         try {
             const { title, description, image, userId } = req.body;
-            // TODO: verificar se o userId existe
-            const result = await ServicesService.createServices(title, description, image || "", userId);
+            await UsersService.getUser(userId)
+            const result = await ServicesService.createServices(userId, title, description, image);
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "serviço criado com sucesso", items: [result] });
@@ -40,7 +41,7 @@ export namespace ServicesController {
         try {
             const { id } = req.params;
             const { title, description, image } = req.body;
-            const result = await ServicesService.updateServices(id, title, description, image || "");
+            const result = await ServicesService.updateServices(id, title, description, image);
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "serviço atualizado com sucesso", items: [result] });
@@ -94,15 +95,13 @@ export namespace ServicesController {
     ) => {
         try {
             let { pageNumber, pageSize, userId } = req.query;
-            pageNumber = pageNumber ? pageNumber : 1;
-            pageSize = pageSize ? pageSize : 10;
             const [users, totalItems] = await Promise.all([
                 await ServicesService.listServices(userId, pageNumber, pageSize),
                 await ServicesService.countServices(userId),
             ]);
             return res.status(StatusCode.OK).json({
                 success: true,
-                message: "",
+                message: "serviços listados com sucesso",
                 items: users,
                 pageNumber,
                 pageSize,

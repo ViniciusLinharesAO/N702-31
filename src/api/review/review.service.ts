@@ -5,7 +5,7 @@ import { StatusCode } from "../http/status-code";
 import { ErrorCodes } from "../common/errors";
 
 export namespace ReviewService {
-    export const createReview = async (grade: string, description: string, userId: string, serviceId: string) => {
+    export const createReview = async (userId: string, serviceId: string, grade: string, description?: string) => {
         try {
             const result = await (await reviewDB).insertOne({ grade, description, userId, serviceId });
             return result.insertedId.toString();
@@ -17,7 +17,7 @@ export namespace ReviewService {
         }
     };
 
-    export const updateReview = async (id: string, grade: string, description: string) => {
+    export const updateReview = async (id: string, grade: string, description?: string) => {
         const filter = { _id: new ObjectId(id) };
         const result = await (await reviewDB).findOneAndReplace(filter, { _id: new ObjectId(id), grade, description });
         if (result == null) {
@@ -38,9 +38,9 @@ export namespace ReviewService {
     export const listReview = async (
         userId: string,
         serviceId: string,
-        pageNumber: number,
-        pageSize: number,
-    ): Promise<Array<{ _id: string; grade: string, description: string }>> => {
+        pageNumber: number = 1,
+        pageSize: number = 10,
+    ): Promise<Array<{ _id: string; grade: string, description?: string }>> => {
         const filter: any = {};
         if (userId) {
             filter.userId = userId;

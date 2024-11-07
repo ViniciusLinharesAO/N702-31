@@ -3,6 +3,8 @@ import { AppError } from "./../../errors/appErrors";
 import { CreateReviewReqBody, RequestParams, RequestResponse, PaginatedResponse, PaginateQuery } from "./review.models";
 import { ReviewService } from "./review.service";
 import { StatusCode } from "../http/status-code";
+import { UsersService } from "../users/users.service";
+import { ServicesService } from "../services/services.service";
 
 export namespace ReviewController {
     export const createReview = async (
@@ -12,9 +14,10 @@ export namespace ReviewController {
     ) => {
         try {
             const { grade, description, userId, serviceId } = req.body;
-            // TODO: verificar se o userId existe
-            // TODO: verificar se o serviceId existe
-            const result = await ReviewService.createReview(grade, description || "", userId, serviceId);
+            await UsersService.getUser(userId)
+            await ServicesService.getUser(serviceId)
+
+            const result = await ReviewService.createReview(userId, serviceId, grade, description);
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "review criado com sucesso", items: [result] });
@@ -41,7 +44,7 @@ export namespace ReviewController {
         try {
             const { id } = req.params;
             const { grade, description } = req.body;
-            const result = await ReviewService.updateReview(id, grade, description || "");
+            const result = await ReviewService.updateReview(id, grade, description);
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "review atualizado com sucesso", items: [result] });
@@ -95,15 +98,13 @@ export namespace ReviewController {
     ) => {
         try {
             let { pageNumber, pageSize, userId, serviceId } = req.query;
-            pageNumber = pageNumber ? pageNumber : 1;
-            pageSize = pageSize ? pageSize : 10;
             const [users, totalItems] = await Promise.all([
                 await ReviewService.listReview(userId, serviceId, pageNumber, pageSize),
                 await ReviewService.countServices(userId, serviceId),
             ]);
             return res.status(StatusCode.OK).json({
                 success: true,
-                message: "",
+                message: "reviews listados com sucesso",
                 items: users,
                 pageNumber,
                 pageSize,

@@ -5,7 +5,7 @@ import { StatusCode } from "../http/status-code";
 import { ErrorCodes } from "../common/errors";
 
 export namespace ServicesService {
-    export const createServices = async (title: string, description: string, image: string, userId: string) => {
+    export const createServices = async (userId: string, title: string, description: string, image?: string) => {
         try {
             const result = await (await servicesDB).insertOne({ title, description, image, userId });
             return result.insertedId.toString();
@@ -17,29 +17,37 @@ export namespace ServicesService {
         }
     };
 
-    export const updateServices = async (id: string, title: string, description: string, image: string) => {
+    export const updateServices = async (id: string, title: string, description: string, image?: string) => {
         const filter = { _id: new ObjectId(id) };
         const result = await (await servicesDB).findOneAndReplace(filter, { _id: new ObjectId(id), title, description, image });
-        if (result == null) {
-            throw new AppError(StatusCode.NOT_FOUND, "serviço não encontrado", ErrorCodes.API.NotFound);
-        }
-        return { _id: result!._id.toString(), title: result!.title, descricao: result!.descricao, image: result!.image };
+        if (!result) throw new AppError(StatusCode.NOT_FOUND, "serviço não encontrado", ErrorCodes.API.NotFound);
+
+        return { _id: result._id.toString(), title: result.title, descricao: result.descricao, image: result.image };
     };
 
     export const deleteServices = async (id: string) => {
         const filter = { _id: new ObjectId(id) };
         const result = await (await servicesDB).findOneAndDelete(filter);
-        if (result == null) {
-            throw new AppError(StatusCode.NOT_FOUND, "serviço não encontrado", ErrorCodes.API.NotFound);
-        }
-        return result!._id;
+        if (!result) throw new AppError(StatusCode.NOT_FOUND, "serviço não encontrado", ErrorCodes.API.NotFound);
+
+        return result._id;
+    };
+
+    export const getUser = async (
+        userId: string
+    ): Promise<{ _id: string; title: string, description: string, image?: string } | null> => {
+        const result = await (await servicesDB).findOne({ _id: new ObjectId(userId) });
+
+        if (!result) throw new AppError(StatusCode.BAD_REQUEST, "serviço não encontrado", ErrorCodes.API.Validation);
+
+        return { _id: result._id.toString(), title: result.title, description: result.description, image: result.image };
     };
 
     export const listServices = async (
         userId: string,
-        pageNumber: number,
-        pageSize: number,
-    ): Promise<Array<{ _id: string; title: string, description: string, image: string }>> => {
+        pageNumber: number = 1,
+        pageSize: number = 10,
+    ): Promise<Array<{ _id: string; title: string, description: string, image?: string }>> => {
         const filter: any = {};
         if (userId) {
             filter.userId = userId;

@@ -10,24 +10,32 @@ export namespace UsersService {
         const filter = { _id: new ObjectId(id) };
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await (await userDB).findOneAndReplace(filter, { _id: new ObjectId(id), name, email, password: hashedPassword });
-        if (result == null) {
-            throw new AppError(StatusCode.NOT_FOUND, "usuário não encontrado", ErrorCodes.API.NotFound);
-        }
-        return { _id: result!._id.toString(), name: result!.name, email: result!.email };
+        if (!result) throw new AppError(StatusCode.NOT_FOUND, "usuário não encontrado", ErrorCodes.API.NotFound);
+
+        return { _id: result._id.toString(), name: result.name, email: result.email };
     };
 
     export const deleteUser = async (id: string) => {
         const filter = { _id: new ObjectId(id) };
         const result = await (await userDB).findOneAndDelete(filter);
-        if (result == null) {
-            throw new AppError(StatusCode.NOT_FOUND, "usuário não encontrado", ErrorCodes.API.NotFound);
-        }
-        return result!.email;
+        if (!result) throw new AppError(StatusCode.NOT_FOUND, "usuário não encontrado", ErrorCodes.API.NotFound);
+
+        return result.email;
+    };
+
+    export const getUser = async (
+        userId: string
+    ): Promise<{ _id: string; name: string; email: string } | null> => {
+        const result = await (await userDB).findOne({ _id: new ObjectId(userId) });
+
+        if (!result) throw new AppError(StatusCode.BAD_REQUEST, "usuário não encontrado", ErrorCodes.API.Validation);
+
+        return { _id: result._id.toString(), name: result.name, email: result.email };
     };
 
     export const listUsers = async (
-        pageNumber: number,
-        pageSize: number,
+        pageNumber: number = 1,
+        pageSize: number = 10,
     ): Promise<Array<{ _id: string; name: string; email: string }>> => {
         const results = await (
             await userDB
