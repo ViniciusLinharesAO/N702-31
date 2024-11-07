@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { AppError } from "../../errors/appErrors";
 import { ErrorCodes } from "../common/errors";
 import { StatusCode } from "../http/status-code";
-import userDB from "./../../infra/database";
+import { userDB } from "./../../infra/database";
 import { MongoServerError } from "mongodb";
 import { SECRET_KEY } from "./../common/auth";
 
@@ -11,6 +11,7 @@ export namespace AuthService {
     export const createUser = async (name: string, email: string, password: string): Promise<string> => {
         try {
             const hashedPassword = await bcrypt.hash(password, 10);
+            // TODO: email deve ser unico
             const result = await (await userDB).insertOne({ name, email, password: hashedPassword });
             return result.insertedId.toString();
         } catch (error) {
