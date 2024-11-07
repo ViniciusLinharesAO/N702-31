@@ -4,7 +4,7 @@ export type RequestParams = {
 export type CreateServicesReqBody = {
   title: string;
   description: string;
-  image: string;
+  image?: string;
   userId: string;
 };
 

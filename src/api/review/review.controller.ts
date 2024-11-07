@@ -14,7 +14,7 @@ export namespace ReviewController {
             const { grade, description, userId, serviceId } = req.body;
             // TODO: verificar se o userId existe
             // TODO: verificar se o serviceId existe
-            const result = await ReviewService.createReview(grade, description, userId, serviceId);
+            const result = await ReviewService.createReview(grade, description || "", userId, serviceId);
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "review criado com sucesso", items: [result] });
@@ -41,7 +41,7 @@ export namespace ReviewController {
         try {
             const { id } = req.params;
             const { grade, description } = req.body;
-            const result = await ReviewService.updateReview(id, grade, description);
+            const result = await ReviewService.updateReview(id, grade, description || "");
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "review atualizado com sucesso", items: [result] });

@@ -13,7 +13,7 @@ export namespace ServicesController {
         try {
             const { title, description, image, userId } = req.body;
             // TODO: verificar se o userId existe
-            const result = await ServicesService.createServices(title, description, image, userId);
+            const result = await ServicesService.createServices(title, description, image || "", userId);
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "serviço criado com sucesso", items: [result] });
@@ -40,7 +40,7 @@ export namespace ServicesController {
         try {
             const { id } = req.params;
             const { title, description, image } = req.body;
-            const result = await ServicesService.updateServices(id, title, description, image);
+            const result = await ServicesService.updateServices(id, title, description, image || "");
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "serviço atualizado com sucesso", items: [result] });

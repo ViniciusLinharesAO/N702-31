@@ -3,7 +3,7 @@ export type RequestParams = {
 };
 export type CreateReviewReqBody = {
   grade: string;
-  description: string;
+  description?: string;
   userId: string;
   serviceId: string;
 };
