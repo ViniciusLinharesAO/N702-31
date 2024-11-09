@@ -25,4 +25,6 @@ namespace db {
     }
 }
 
-export default db.connectToDatabase("users");
+export const userDB = db.connectToDatabase("users");
+export const servicesDB = db.connectToDatabase("services");
+export const reviewDB = db.connectToDatabase("reviews");

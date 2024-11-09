@@ -3,13 +3,16 @@ import bcrypt from "bcrypt";
 import { AppError } from "../../errors/appErrors";
 import { ErrorCodes } from "../common/errors";
 import { StatusCode } from "../http/status-code";
-import userDB from "./../../infra/database";
+import { userDB } from "./../../infra/database";
 import { MongoServerError } from "mongodb";
 import { SECRET_KEY } from "./../common/auth";
+import { UsersService } from "../users/users.service";
 
 export namespace AuthService {
     export const createUser = async (name: string, email: string, password: string): Promise<string> => {
         try {
+            const user = await UsersService.getUser(undefined, email).catch(()=>{})
+            if (user) throw new AppError(StatusCode.BAD_REQUEST, `o email '${email}' já existe`, ErrorCodes.API.Validation);
             const hashedPassword = await bcrypt.hash(password, 10);
             const result = await (await userDB).insertOne({ name, email, password: hashedPassword });
             return result.insertedId.toString();
