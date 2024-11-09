@@ -33,6 +33,6 @@ const v1Routes = Router()
     .use("/auth", authRouter)
     .use("/users", userRouter)
     .use("/services", servicesRouter)
-    .use("/services", reviewRouter);
+    .use("/review", reviewRouter);
 
 export default Router().use("/v1", v1Routes);

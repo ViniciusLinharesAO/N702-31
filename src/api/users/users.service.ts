@@ -7,9 +7,18 @@ import { ErrorCodes } from "../common/errors";
 
 export namespace UsersService {
     export const updateUser = async (id: string, name: string, email: string, password: string) => {
+        const user = await getUser(id, undefined)
+
         const filter = { _id: new ObjectId(id) };
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        const result = await (await userDB).findOneAndReplace(filter, { _id: new ObjectId(id), name, email, password: hashedPassword });
+
+        let newUser = {...user, password: "", _id: new ObjectId(id)}
+        if (name) newUser.name = name
+        if (email) newUser.email = email
+        if (password) newUser.password = hashedPassword
+
+        const result = await (await userDB).findOneAndReplace(filter, newUser);
         if (!result) throw new AppError(StatusCode.NOT_FOUND, "usuário não encontrado", ErrorCodes.API.NotFound);
 
         return { _id: result._id.toString(), name: result.name, email: result.email };
@@ -24,9 +33,20 @@ export namespace UsersService {
     };
 
     export const getUser = async (
-        userId: string
+        userId?: string,
+        email?: string
     ): Promise<{ _id: string; name: string; email: string } | null> => {
-        const result = await (await userDB).findOne({ _id: new ObjectId(userId) });
+        const filter: any = {};
+
+        if (userId) {
+            filter._id = new ObjectId(userId);
+        }
+
+        if (email) {
+            filter.email = email;
+        }
+
+        const result = await (await userDB).findOne(filter);
 
         if (!result) throw new AppError(StatusCode.BAD_REQUEST, "usuário não encontrado", ErrorCodes.API.Validation);
 

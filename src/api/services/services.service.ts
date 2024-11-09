@@ -18,8 +18,15 @@ export namespace ServicesService {
     };
 
     export const updateServices = async (id: string, title: string, description: string, image?: string) => {
+        const service = await getService(id)
+
         const filter = { _id: new ObjectId(id) };
-        const result = await (await servicesDB).findOneAndReplace(filter, { _id: new ObjectId(id), title, description, image });
+        const newService = {...service, _id: new ObjectId(id)};
+        if (title) newService.title = title
+        if (description) newService.description = description
+        if (image) newService.image = image
+
+        const result = await (await servicesDB).findOneAndReplace(filter, newService);
         if (!result) throw new AppError(StatusCode.NOT_FOUND, "serviço não encontrado", ErrorCodes.API.NotFound);
 
         return { _id: result._id.toString(), title: result.title, descricao: result.descricao, image: result.image };
@@ -33,14 +40,14 @@ export namespace ServicesService {
         return result._id;
     };
 
-    export const getUser = async (
+    export const getService = async (
         userId: string
-    ): Promise<{ _id: string; title: string, description: string, image?: string } | null> => {
+    ): Promise<{ _id: string; title: string, description: string, userId: string, image?: string } | null> => {
         const result = await (await servicesDB).findOne({ _id: new ObjectId(userId) });
 
         if (!result) throw new AppError(StatusCode.BAD_REQUEST, "serviço não encontrado", ErrorCodes.API.Validation);
 
-        return { _id: result._id.toString(), title: result.title, description: result.description, image: result.image };
+        return { _id: result._id.toString(), title: result.title, description: result.description, image: result.image, userId: result.userId };
     };
 
     export const listServices = async (

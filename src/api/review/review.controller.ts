@@ -15,7 +15,7 @@ export namespace ReviewController {
         try {
             const { grade, description, userId, serviceId } = req.body;
             await UsersService.getUser(userId)
-            await ServicesService.getUser(serviceId)
+            await ServicesService.getService(serviceId)
 
             const result = await ReviewService.createReview(userId, serviceId, grade, description);
             return res
