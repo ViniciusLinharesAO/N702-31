@@ -6,7 +6,13 @@ import { StatusCode } from "../http/status-code";
 import { ErrorCodes } from "../common/errors";
 
 export namespace UsersService {
-    export const updateUser = async (id: string, name: string, email: string, password: string) => {
+    export const updateUser = async (
+        id: string,
+        name: string,
+        email: string,
+        phoneNumber: string,
+        password: string,
+    ) => {
         const user = await getUser(id, undefined);
 
         const filter = { _id: new ObjectId(id) };
@@ -16,12 +22,13 @@ export namespace UsersService {
         let newUser = { ...user, password: "", _id: new ObjectId(id) };
         if (name) newUser.name = name;
         if (email) newUser.email = email;
+        if (phoneNumber) newUser.phoneNumber = phoneNumber;
         if (password) newUser.password = hashedPassword;
 
         const result = await (await userDB).findOneAndReplace(filter, newUser);
         if (!result) throw new AppError(StatusCode.NOT_FOUND, "usuário não encontrado", ErrorCodes.API.NotFound);
 
-        return { _id: result._id.toString(), name: result.name, email: result.email };
+        return { _id: result._id.toString(), name: result.name, email: result.email, phoneNumber: result.phoneNumber };
     };
 
     export const deleteUser = async (id: string) => {
@@ -35,7 +42,7 @@ export namespace UsersService {
     export const getUser = async (
         userId?: string,
         email?: string,
-    ): Promise<{ _id: string; name: string; email: string } | null> => {
+    ): Promise<{ _id: string; name: string; email: string; phoneNumber: string } | null> => {
         const filter: any = {};
 
         if (userId) {
@@ -50,13 +57,13 @@ export namespace UsersService {
 
         if (!result) throw new AppError(StatusCode.BAD_REQUEST, "usuário não encontrado", ErrorCodes.API.Validation);
 
-        return { _id: result._id.toString(), name: result.name, email: result.email };
+        return { _id: result._id.toString(), name: result.name, email: result.email, phoneNumber: result.phoneNumber };
     };
 
     export const listUsers = async (
         pageNumber: number = 1,
         pageSize: number = 10,
-    ): Promise<Array<{ _id: string; name: string; email: string }>> => {
+    ): Promise<Array<{ _id: string; name: string; email: string; phoneNumber: string }>> => {
         const results = await (
             await userDB
         )
@@ -67,7 +74,12 @@ export namespace UsersService {
             .toArray();
 
         return results.map((result) => {
-            return { _id: result._id.toString(), name: result.name, email: result.email };
+            return {
+                _id: result._id.toString(),
+                name: result.name,
+                email: result.email,
+                phoneNumber: result.phoneNumber,
+            };
         });
     };
 

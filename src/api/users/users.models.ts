@@ -4,6 +4,7 @@ export type RequestParams = {
 export type CreateUserReqBody = {
     name: string;
     email: string;
+    phoneNumber: string;
     password: string;
 };
 
