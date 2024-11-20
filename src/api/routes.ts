@@ -5,9 +5,7 @@ import { AuthController } from "./auth/auth.controller";
 import { auth } from "./common/auth";
 import { ReviewController } from "./review/review.controller";
 
-const authRouter = Router()
-    .post("/register", AuthController.register)
-    .post("/login", AuthController.login);
+const authRouter = Router().post("/register", AuthController.register).post("/login", AuthController.login);
 
 const userRouter = Router()
     .use(auth)

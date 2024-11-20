@@ -19,11 +19,11 @@ export namespace ReviewService {
 
     export const updateReview = async (id: string, grade: string, description?: string) => {
         const filter = { _id: new ObjectId(id) };
-        const review = await getReview(id)
+        const review = await getReview(id);
 
-        const newReview = {...review, _id: new ObjectId(id)};
-        if (grade) newReview.grade = grade
-        if (description) newReview.description = description
+        const newReview = { ...review, _id: new ObjectId(id) };
+        if (grade) newReview.grade = grade;
+        if (description) newReview.description = description;
 
         const result = await (await reviewDB).findOneAndReplace(filter, newReview);
         if (result == null) {
@@ -44,12 +44,18 @@ export namespace ReviewService {
 
     export const getReview = async (
         reviewId: string,
-    ): Promise<{ _id: string; grade: string, description?: string, userId: string, serviceId: string } | null> => {
+    ): Promise<{ _id: string; grade: string; description?: string; userId: string; serviceId: string } | null> => {
         const result = await (await reviewDB).findOne({ _id: new ObjectId(reviewId) });
 
         if (!result) throw new AppError(StatusCode.BAD_REQUEST, "review não encontrado", ErrorCodes.API.Validation);
 
-        return { _id: result._id.toString(), grade: result.grade, description: result.description, userId: result.userId, serviceId: result.serviceId };
+        return {
+            _id: result._id.toString(),
+            grade: result.grade,
+            description: result.description,
+            userId: result.userId,
+            serviceId: result.serviceId,
+        };
     };
 
     export const listReview = async (
@@ -57,7 +63,7 @@ export namespace ReviewService {
         serviceId: string,
         pageNumber: number = 1,
         pageSize: number = 10,
-    ): Promise<Array<{ _id: string; grade: string, description?: string }>> => {
+    ): Promise<Array<{ _id: string; grade: string; description?: string }>> => {
         const filter: any = {};
         if (userId) {
             filter.userId = userId;
@@ -80,7 +86,7 @@ export namespace ReviewService {
         });
     };
 
-    export const countServices = async (userId: string, serviceId: string ) => {
+    export const countServices = async (userId: string, serviceId: string) => {
         const filter: any = {};
         if (userId) {
             filter.userId = userId;

@@ -1,19 +1,25 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "./../../errors/appErrors";
-import { CreateServicesReqBody, RequestParams, RequestResponse, PaginatedResponse, PaginateQuery } from "./services.models";
+import {
+    CreateServicesReqBody,
+    RequestParams,
+    RequestResponse,
+    PaginatedResponse,
+    PaginateQuery,
+} from "./services.models";
 import { ServicesService } from "./services.service";
 import { StatusCode } from "../http/status-code";
 import { UsersService } from "../users/users.service";
 
 export namespace ServicesController {
     export const createServices = async (
-      req: Request<any, any, CreateServicesReqBody>,
-      res: Response<RequestResponse>,
-      next: NextFunction,
+        req: Request<any, any, CreateServicesReqBody>,
+        res: Response<RequestResponse>,
+        next: NextFunction,
     ) => {
         try {
             const { title, description, image, userId } = req.body;
-            await UsersService.getUser(userId)
+            await UsersService.getUser(userId);
             const result = await ServicesService.createServices(userId, title, description, image);
             return res
                 .status(StatusCode.OK)

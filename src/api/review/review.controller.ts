@@ -8,14 +8,14 @@ import { ServicesService } from "../services/services.service";
 
 export namespace ReviewController {
     export const createReview = async (
-      req: Request<any, any, CreateReviewReqBody>,
-      res: Response<RequestResponse>,
-      next: NextFunction,
+        req: Request<any, any, CreateReviewReqBody>,
+        res: Response<RequestResponse>,
+        next: NextFunction,
     ) => {
         try {
             const { grade, description, userId, serviceId } = req.body;
-            await UsersService.getUser(userId)
-            await ServicesService.getService(serviceId)
+            await UsersService.getUser(userId);
+            await ServicesService.getService(serviceId);
 
             const result = await ReviewService.createReview(userId, serviceId, grade, description);
             return res
@@ -92,7 +92,7 @@ export namespace ReviewController {
     };
 
     export const listReviews = async (
-        req: Request<any, any, any, PaginateQuery & { userId: string, serviceId: string }>,
+        req: Request<any, any, any, PaginateQuery & { userId: string; serviceId: string }>,
         res: Response<PaginatedResponse>,
         next: NextFunction,
     ) => {
