@@ -131,4 +131,35 @@ export namespace ReviewController {
             });
         }
     };
+
+    export const getReviewById = async (
+        req: Request<RequestParams, any, any, any>,
+        res: Response<any>,
+        next: NextFunction,
+    ) => {
+        try {
+            let { id } = req.params;
+            const review = await ReviewService.getReview(id);
+            return res.status(StatusCode.OK).json(review);
+        } catch (error: unknown) {
+            console.error("Failed to get review", error);
+            if (error instanceof AppError)
+                return res.status(error.status === undefined ? StatusCode.INTERNAL_SERVER_ERROR : error.status).json({
+                    success: false,
+                    message: error.message,
+                    items: [],
+                    pageNumber: 0,
+                    pageSize: 0,
+                    totalItems: 0,
+                });
+            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: "unexpected error",
+                items: [],
+                pageNumber: 0,
+                pageSize: 0,
+                totalItems: 0,
+            });
+        }
+    };
 }

@@ -12,12 +12,14 @@ const authRouter = Router()
 const userRouter = Router()
     .use(auth)
     .get("/", UserController.listAllUsers)
+    .get("/:id", UserController.getUserById)
     .patch("/:id", UserController.updateUser)
     .delete("/:id", UserController.deleteUser);
 
 const servicesRouter = Router()
     .use(auth)
     .get("/", ServicesController.listServices)
+    .get("/:id", ServicesController.getServiceById)
     .post("/", ServicesController.createServices)
     .patch("/:id", ServicesController.updateServices)
     .delete("/:id", ServicesController.deleteUser);
@@ -25,6 +27,7 @@ const servicesRouter = Router()
 const reviewRouter = Router()
     .use(auth)
     .get("/", ReviewController.listReviews)
+    .get("/:id", ReviewController.getReviewById)
     .post("/", ReviewController.createReview)
     .patch("/:id", ReviewController.updateReview)
     .delete("/:id", ReviewController.deleteReview);
