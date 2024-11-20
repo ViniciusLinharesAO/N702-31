@@ -1,19 +1,25 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "./../../errors/appErrors";
-import { CreateServicesReqBody, RequestParams, RequestResponse, PaginatedResponse, PaginateQuery } from "./services.models";
+import {
+    CreateServicesReqBody,
+    RequestParams,
+    RequestResponse,
+    PaginatedResponse,
+    PaginateQuery,
+} from "./services.models";
 import { ServicesService } from "./services.service";
 import { StatusCode } from "../http/status-code";
 import { UsersService } from "../users/users.service";
 
 export namespace ServicesController {
     export const createServices = async (
-      req: Request<any, any, CreateServicesReqBody>,
-      res: Response<RequestResponse>,
-      next: NextFunction,
+        req: Request<any, any, CreateServicesReqBody>,
+        res: Response<RequestResponse>,
+        next: NextFunction,
     ) => {
         try {
             const { title, description, image, userId } = req.body;
-            await UsersService.getUser(userId)
+            await UsersService.getUser(userId);
             const result = await ServicesService.createServices(userId, title, description, image);
             return res
                 .status(StatusCode.OK)
@@ -103,12 +109,43 @@ export namespace ServicesController {
                 success: true,
                 message: "serviços listados com sucesso",
                 items: users,
-                pageNumber,
-                pageSize,
+                pageNumber: pageNumber ? pageNumber : 1,
+                pageSize: pageSize ? pageSize : 10,
                 totalItems,
             });
         } catch (error: unknown) {
             console.error("Failed to update services", error);
+            if (error instanceof AppError)
+                return res.status(error.status === undefined ? StatusCode.INTERNAL_SERVER_ERROR : error.status).json({
+                    success: false,
+                    message: error.message,
+                    items: [],
+                    pageNumber: 0,
+                    pageSize: 0,
+                    totalItems: 0,
+                });
+            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: "unexpected error",
+                items: [],
+                pageNumber: 0,
+                pageSize: 0,
+                totalItems: 0,
+            });
+        }
+    };
+
+    export const getServiceById = async (
+        req: Request<RequestParams, any, any, any>,
+        res: Response<any>,
+        next: NextFunction,
+    ) => {
+        try {
+            let { id } = req.params;
+            const service = await ServicesService.getService(id);
+            return res.status(StatusCode.OK).json(service);
+        } catch (error: unknown) {
+            console.error("Failed to get service", error);
             if (error instanceof AppError)
                 return res.status(error.status === undefined ? StatusCode.INTERNAL_SERVER_ERROR : error.status).json({
                     success: false,

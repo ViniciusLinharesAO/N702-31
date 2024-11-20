@@ -17,10 +17,9 @@ namespace db {
             console.log(`Successfully connected to db collection: ${targetCollection}`);
 
             return collection;
-
         } catch (error) {
-            console.log(error)
-            throw error
+            console.log(error);
+            throw error;
         }
     }
 }

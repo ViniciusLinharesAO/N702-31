@@ -8,14 +8,14 @@ import { ServicesService } from "../services/services.service";
 
 export namespace ReviewController {
     export const createReview = async (
-      req: Request<any, any, CreateReviewReqBody>,
-      res: Response<RequestResponse>,
-      next: NextFunction,
+        req: Request<any, any, CreateReviewReqBody>,
+        res: Response<RequestResponse>,
+        next: NextFunction,
     ) => {
         try {
             const { grade, description, userId, serviceId } = req.body;
-            await UsersService.getUser(userId)
-            await ServicesService.getService(serviceId)
+            await UsersService.getUser(userId);
+            await ServicesService.getService(serviceId);
 
             const result = await ReviewService.createReview(userId, serviceId, grade, description);
             return res
@@ -92,7 +92,7 @@ export namespace ReviewController {
     };
 
     export const listReviews = async (
-        req: Request<any, any, any, PaginateQuery & { userId: string, serviceId: string }>,
+        req: Request<any, any, any, PaginateQuery & { userId: string; serviceId: string }>,
         res: Response<PaginatedResponse>,
         next: NextFunction,
     ) => {
@@ -106,12 +106,43 @@ export namespace ReviewController {
                 success: true,
                 message: "reviews listados com sucesso",
                 items: users,
-                pageNumber,
-                pageSize,
+                pageNumber: pageNumber ? pageNumber : 1,
+                pageSize: pageSize ? pageSize : 10,
                 totalItems,
             });
         } catch (error: unknown) {
             console.error("Failed to update review", error);
+            if (error instanceof AppError)
+                return res.status(error.status === undefined ? StatusCode.INTERNAL_SERVER_ERROR : error.status).json({
+                    success: false,
+                    message: error.message,
+                    items: [],
+                    pageNumber: 0,
+                    pageSize: 0,
+                    totalItems: 0,
+                });
+            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: "unexpected error",
+                items: [],
+                pageNumber: 0,
+                pageSize: 0,
+                totalItems: 0,
+            });
+        }
+    };
+
+    export const getReviewById = async (
+        req: Request<RequestParams, any, any, any>,
+        res: Response<any>,
+        next: NextFunction,
+    ) => {
+        try {
+            let { id } = req.params;
+            const review = await ReviewService.getReview(id);
+            return res.status(StatusCode.OK).json(review);
+        } catch (error: unknown) {
+            console.error("Failed to get review", error);
             if (error instanceof AppError)
                 return res.status(error.status === undefined ? StatusCode.INTERNAL_SERVER_ERROR : error.status).json({
                     success: false,
