@@ -63,7 +63,7 @@ export namespace ReviewService {
         serviceId: string,
         pageNumber: number = 1,
         pageSize: number = 10,
-    ): Promise<Array<{ _id: string; grade: string; description?: string }>> => {
+    ): Promise<Array<{ _id: string; grade: string; description?: string; userId: string; serviceId: string }>> => {
         const filter: any = {};
         if (userId) {
             filter.userId = userId;
@@ -82,7 +82,13 @@ export namespace ReviewService {
             .toArray();
 
         return results.map((result) => {
-            return { _id: result._id.toString(), grade: result.grade, description: result.description };
+            return {
+                _id: result._id.toString(),
+                grade: result.grade,
+                description: result.description,
+                userId: result.userId,
+                serviceId: result.serviceId,
+            };
         });
     };
 

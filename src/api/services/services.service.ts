@@ -60,7 +60,7 @@ export namespace ServicesService {
         userId: string,
         pageNumber: number = 1,
         pageSize: number = 10,
-    ): Promise<Array<{ _id: string; title: string; description: string; image?: string }>> => {
+    ): Promise<Array<{ _id: string; title: string; description: string; image?: string; userId: string }>> => {
         const filter: any = {};
         if (userId) {
             filter.userId = userId;
@@ -81,6 +81,7 @@ export namespace ServicesService {
                 title: result.title,
                 description: result.description,
                 image: result.image,
+                userId: result.userId,
             };
         });
     };

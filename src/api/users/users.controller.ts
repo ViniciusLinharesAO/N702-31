@@ -75,8 +75,8 @@ export namespace UserController {
                 success: true,
                 message: "usuários listados com sucesso",
                 items: users,
-                pageNumber,
-                pageSize,
+                pageNumber: pageNumber ? pageNumber : 1,
+                pageSize: pageSize ? pageSize : 10,
                 totalItems,
             });
         } catch (error: unknown) {
