@@ -12,8 +12,8 @@ export namespace UserController {
     ) => {
         try {
             const { id } = req.params;
-            const { name, email, password } = req.body;
-            const result = await UsersService.updateUser(id, name, email, password);
+            const { name, email, phoneNumber, password } = req.body;
+            const result = await UsersService.updateUser(id, name, email, phoneNumber, password);
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "usuários atualizado com sucesso", items: [result] });

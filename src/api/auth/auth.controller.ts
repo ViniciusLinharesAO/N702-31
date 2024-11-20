@@ -11,8 +11,8 @@ export namespace AuthController {
         next: NextFunction,
     ) => {
         try {
-            const { name, email, password } = req.body;
-            const result = await AuthService.createUser(name, email, password);
+            const { name, email, phoneNumber, password } = req.body;
+            const result = await AuthService.createUser(name, email, phoneNumber, password);
             return res
                 .status(StatusCode.OK)
                 .json({ success: true, message: "usuário criado com sucesso", items: [{ userId: result }] });
